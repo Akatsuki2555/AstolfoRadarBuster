@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Reflection;
 using MSCLoader;
 using UnityEngine;
 
@@ -27,29 +25,45 @@ namespace AstolfoRadarBuster
 
         private void Mod_Load()
         {
-            var assetBundle = AssetBundle.CreateFromMemoryImmediate(Resource1.astolfoplushie);
-
-            var beanPlushie = assetBundle.LoadAsset<GameObject>("Astolfo");
-            _plushie = GameObject.Instantiate(beanPlushie);
-            _plushie.AddComponent<Rigidbody>();
-            _plushie.MakePickable();
-            _plushie.name = "Astolfo Plushie(Clone)";
-            var player = GameObject.Find("PLAYER");
-            _plushie.transform.position = player.transform.position;
-
-            if (SaveLoad.ValueExists(this, "plushiePos") && SaveLoad.ValueExists(this, "plushieRot"))
+            var radarBusterAudio = GameObject.Find("MasterAudio").transform
+                .Find("CarFoley/radar_buster").gameObject;
+            var radarBuster = GameObject.Find("radar buster(Clone)");
+            if (radarBuster == null)
             {
-                _plushie.transform.position = SaveLoad.ReadValue<Vector3>(this, "plushiePos");
-                _plushie.transform.rotation = SaveLoad.ReadValue<Quaternion>(this, "plushieRot");
+                radarBuster = GameObject.Find("SATSUMA(557kg, 248)")
+                    .transform.Find("Dashboard/pivot_dashboard/dashboard(Clone)/pivot_radar_buster/radar buster(Clone)")
+                    .gameObject;
             }
+
+            byte[] numArray;
+            using (var manifestResourceStream = Assembly.GetExecutingAssembly()
+                       .GetManifestResourceStream("AstolfoRadarBuster.Resources.astolforadar.unity3d"))
+            {
+                if (manifestResourceStream == null)
+                    throw new Exception("The mod DLL is corrupted, unable to load astolforadar.unity3d. Cannot continue");
+                numArray = new byte[manifestResourceStream.Length];
+                _ = manifestResourceStream.Read(numArray, 0, numArray.Length);
+            }
+
+            var assetBundle = numArray.Length != 0
+                ? AssetBundle.CreateFromMemoryImmediate(numArray)
+                : throw new Exception("The mod DLL is corrupted, unable to load astolforadar.unity3d. Cannot continue");
+
+            var radarBusterModel = assetBundle.LoadAsset<GameObject>("bean2");
+            var radarBusterTexture = assetBundle.LoadAsset<Texture2D>("bean");
+            var radarBusterAudioClip = assetBundle.LoadAsset<AudioClip>("yahoo");
+            
+            radarBuster.GetComponent<MeshFilter>().mesh = radarBusterModel.GetComponent<MeshFilter>().sharedMesh;
+            radarBuster.GetComponent<MeshRenderer>().material.mainTexture = radarBusterTexture;
+            radarBusterAudio.GetComponent<AudioSource>().clip = radarBusterAudioClip;
 
             assetBundle.Unload(false);
         }
 
         private void Mod_OnSave()
         {
-            SaveLoad.WriteValue<Vector3>(this, "plushiePos", _plushie.transform.position);
-            SaveLoad.WriteValue<Quaternion>(this, "plushieRot", _plushie.transform.rotation);
+            SaveLoad.WriteValue(this, "plushiePos", _plushie.transform.position);
+            SaveLoad.WriteValue(this, "plushieRot", _plushie.transform.rotation);
         }
     }
 }
