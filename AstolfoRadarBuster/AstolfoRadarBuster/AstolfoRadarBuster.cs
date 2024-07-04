@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Reflection;
+using JetBrains.Annotations;
 using MSCLoader;
 using UnityEngine;
 
 namespace AstolfoRadarBuster
 {
+    [UsedImplicitly]
     public class AstolfoRadarBuster : Mod
     {
         public override string ID => "AstolfoRadarBuster";
@@ -17,16 +19,13 @@ namespace AstolfoRadarBuster
         {
             base.ModSetup();
 
-            SetupFunction(Setup.OnLoad, Mod_Load);
-            SetupFunction(Setup.OnSave, Mod_OnSave);
+            SetupFunction(Setup.PostLoad, Mod_Load);
         }
-
-        private GameObject _plushie;
 
         private void Mod_Load()
         {
             var radarBusterAudio = GameObject.Find("MasterAudio").transform
-                .Find("CarFoley/radar_buster").gameObject;
+                .Find("CarFoley/radar_buster").GetComponent<AudioSource>();
             var radarBuster = GameObject.Find("radar buster(Clone)");
             if (radarBuster == null)
             {
@@ -49,21 +48,24 @@ namespace AstolfoRadarBuster
                 ? AssetBundle.CreateFromMemoryImmediate(numArray)
                 : throw new Exception("The mod DLL is corrupted, unable to load astolforadar.unity3d. Cannot continue");
 
-            var radarBusterModel = assetBundle.LoadAsset<GameObject>("bean2");
-            var radarBusterTexture = assetBundle.LoadAsset<Texture2D>("bean");
+            var radarBusterAstolfo = assetBundle.LoadAsset<GameObject>("Astolfo");
             var radarBusterAudioClip = assetBundle.LoadAsset<AudioClip>("yahoo");
+
+            var radarBusterAstolfoInstance = GameObject.Instantiate(radarBusterAstolfo);
+            radarBusterAstolfoInstance.transform.parent = radarBuster.transform;
+            radarBusterAstolfoInstance.transform.localPosition = new Vector3(0, 0.015f, -0.019f);
+            radarBusterAstolfoInstance.transform.localRotation = Quaternion.Euler(300, 285, 225);
+            radarBusterAstolfoInstance.transform.localScale = new Vector3(0.025f, 0.025f, 0.025f);
             
-            radarBuster.GetComponent<MeshFilter>().mesh = radarBusterModel.GetComponent<MeshFilter>().sharedMesh;
-            radarBuster.GetComponent<MeshRenderer>().material.mainTexture = radarBusterTexture;
-            radarBusterAudio.GetComponent<AudioSource>().clip = radarBusterAudioClip;
+            radarBuster.GetComponent<MeshRenderer>().enabled = false;
+            
+            var radarBusterLogik = radarBuster.transform.Find("Logic");
+            radarBusterLogik.localPosition = new Vector3(0.008f, 0.001f, 0.015f);
+            
+            radarBusterAudio.clip = radarBusterAudioClip;
+            radarBusterAudio.Play();
 
             assetBundle.Unload(false);
-        }
-
-        private void Mod_OnSave()
-        {
-            SaveLoad.WriteValue(this, "plushiePos", _plushie.transform.position);
-            SaveLoad.WriteValue(this, "plushieRot", _plushie.transform.rotation);
         }
     }
 }
