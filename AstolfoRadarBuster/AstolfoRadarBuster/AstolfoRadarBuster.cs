@@ -5,11 +5,11 @@ using System.Text;
 using MSCLoader;
 using UnityEngine;
 
-namespace AstolfoBeanPlushie
+namespace AstolfoRadarBuster
 {
-    public class AstolfoBeanPlushie : Mod
+    public class AstolfoRadarBuster : Mod
     {
-        public override string ID => "AstolfoBeanPlushie";
+        public override string ID => "AstolfoRadarBuster";
 
         public override string Version => "0.1";
 

@@ -7,8 +7,8 @@
     <ProjectGuid>{B13673FC-BFD0-479A-85B3-FD9E0A62347D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AstolfoBeanPlushie</RootNamespace>
-    <AssemblyName>AstolfoBeanPlushie</AssemblyName>
+    <RootNamespace>AstolfoRadarBuster</RootNamespace>
+    <AssemblyName>AstolfoRadarBuster</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -71,7 +71,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AstolfoBeanPlushie.cs" />
+    <Compile Include="AstolfoRadarBuster.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resource1.Designer.cs">
       <AutoGen>True</AutoGen>
